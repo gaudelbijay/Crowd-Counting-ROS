@@ -93,4 +93,36 @@ class VGG(nn.Module):
 class MapPath(nn.Module):
     def __init__(self) -> None:
         super(MapPath, self).__init__()
-        pass 
+        self.upsample = UpSampling(scale_factor=2)
+
+        self.conv1 = BaseConv(1024, 256, 1, 1, activation=nn.ReLU(), use_bn=True)
+        self.conv2 = BaseConv(256, 256, 3, 1, activation=nn.ReLU(), use_bn=True)
+
+        self.conv3 = BaseConv(512, 128, 1, 1, activation=nn.ReLU(), use_bn=True)
+        self.conv4 = BaseConv(128, 128, 3, 1, activation=nn.ReLU(), use_bn=True)
+
+        self.conv5 = BaseConv(256, 64, 1, 1, activation=nn.ReLU(), use_bn=True)
+        self.conv6 = BaseConv(64, 64, 3, 1, activation=nn.ReLU(), use_bn=True)
+        self.conv7 = BaseConv(64, 32, 3, 1, activation=nn.ReLU(), use_bn=True)
+
+    def forward(self, *input):
+        conv2_2, conv3_3, conv4_3, conv5_3 = input
+
+        input = self.upsample(conv5_3)
+
+        input = torch.cat([input, conv4_3], 1)
+        input = self.conv1(input)
+        input = self.conv2(input)
+        input = self.upsample(input)
+
+        input = torch.cat([input, conv3_3], 1)
+        input = self.conv3(input)
+        input = self.conv4(input)
+        input = self.upsample(input)
+
+        input = torch.cat([input, conv2_2], 1)
+        input = self.conv5(input)
+        input = self.conv6(input)
+        input = self.conv7(input)
+
+        return input
