@@ -23,6 +23,7 @@ class BaseConv(nn.Module):
 
         return output 
 
+
 class BasePool(nn.Module):
     def __init__(self, windows=2) -> None:
         super(BasePool, self).__init__()
@@ -32,6 +33,7 @@ class BasePool(nn.Module):
         output = self.bn(input)
         return output
 
+
 class UpSampling(nn.Module):
     def __init__(self, factor=2) -> None:
         super(UpSampling, self).__init__()
@@ -40,6 +42,7 @@ class UpSampling(nn.Module):
     def forward(self, input):
         output = self.up(input)
         return output
+
 
 class VGG(nn.Module):
     def __init__(self) -> None:
@@ -90,10 +93,11 @@ class VGG(nn.Module):
 
         return conv2_2, conv3_3, conv4_3, conv5_3
 
+
 class MapPath(nn.Module):
     def __init__(self) -> None:
         super(MapPath, self).__init__()
-        self.upsample = UpSampling(scale_factor=2)
+        self.upsample = UpSampling(factor=2)
 
         self.conv1 = BaseConv(1024, 256, 1, 1, activation=nn.ReLU(), use_bn=True)
         self.conv2 = BaseConv(256, 256, 3, 1, activation=nn.ReLU(), use_bn=True)
@@ -126,3 +130,50 @@ class MapPath(nn.Module):
         input = self.conv7(input)
 
         return input
+
+
+class ModelNetwork(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.vgg = VGG()
+        self.amp = MapPath()
+        self.dmp = MapPath()
+
+        self.conv_att = BaseConv(32, 1, 1, 1, activation=nn.Sigmoid(), use_bn=True)
+        self.conv_out = BaseConv(32, 1, 1, 1, activation=None, use_bn=False)
+    
+    def load_vgg(self):
+        state_dict = model_zoo.load_url('https://download.pytorch.org/models/vgg16_bn-6c64b313.pth')
+        old_name = [0, 1, 3, 4, 7, 8, 10, 11, 14, 15, 17, 18, 20, 21, 24, 25, 27, 28, 30, 31, 34, 35, 37, 38, 40, 41]
+        new_name = [1.0, 1.1, 2.0, 2.1, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.1, 5.2, 5.3]
+        new_dict = {}
+        print(state_dict.keys())
+        for i in range(len(new_name)):
+            new_dict['block' + str(new_name[i]) + '.conv.weight'] = state_dict['features.'+str(old_name[2*i])+'.weight']
+            new_dict['block' + str(new_name[i]) + '.conv.bias'] = state_dict['features.' + str(old_name[2 * i]) + '.bias']
+            new_dict['block' + str(new_name[i]) + '.bn.weight'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.weight']
+            new_dict['block' + str(new_name[i]) + '.bn.bias'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.bias']
+            new_dict['block' + str(new_name[i]) + '.bn.running_mean'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_mean']
+            new_dict['block' + str(new_name[i]) + '.bn.running_var'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_var']
+
+        self.vgg.load_state_dict(new_dict)
+
+    def forward(self, input):
+        input = self.vgg(input)
+        amp_out = self.amp(*input)
+        dmp_out = self.dmp(*input)
+
+        amp_out = self.conv_att(amp_out)
+        dmp_out = amp_out * dmp_out
+        dmp_out = self.conv_out(dmp_out)
+
+        return dmp_out, amp_out
+
+
+if __name__ == '__main__':
+    input = torch.randn(8, 3, 400, 400)
+    model = ModelNetwork()
+    output, attention = model(input)
+    print(input.size())
+    print(output.size())
+    print(attention.size())
