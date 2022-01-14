@@ -73,6 +73,8 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
     writer.add_scalar('loss/train_loss', loss_avg / len(train_loader), epoch)
     writer.add_scalar('loss/train_loss_att', loss_att_avg / len(train_loader), epoch)
 
+
+    # TODO: Need to fix different devices problem during evaluation (gpu and cpu) 
     model.eval()
     with torch.no_grad():
         mae, mse = 0.0, 0.0
