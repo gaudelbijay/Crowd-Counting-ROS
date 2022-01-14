@@ -4,24 +4,25 @@ from torch.utils import model_zoo
 
 
 class BaseConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel, stride=1, activation=None, use_bn=False) -> None:
+    def __init__(self, in_channels, out_channels, kernel, stride=1, activation=None, use_bn=False):
         super(BaseConv, self).__init__()
         self.use_bn = use_bn
         self.activation = activation
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel, stride, kernel//2)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel, stride, kernel // 2)
         self.conv.weight.data.normal_(0, 0.01)
         self.conv.bias.data.zero_()
         self.bn = nn.BatchNorm2d(out_channels)
+        self.bn.weight.data.fill_(1)
         self.bn.bias.data.zero_()
-    
-    def forward(self, input):
-        output = self.conv(input)
-        if self.use_bn:
-            output = self.conv(output)
-        if self.activation:
-            output = self.activation(output)
 
-        return output 
+    def forward(self, input):
+        input = self.conv(input)
+        if self.use_bn:
+            input = self.bn(input)
+        if self.activation:
+            input = self.activation(input)
+
+        return input
 
 
 class BasePool(nn.Module):
@@ -50,33 +51,33 @@ class VGG(nn.Module):
 
         self.block_1 = nn.Sequential(
             BaseConv(3, 64, 3, 1, activation=nn.ReLU(), use_bn=True), 
-            BaseConv(3, 64, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(64, 64, 3, 1, activation=nn.ReLU(), use_bn=True),
             BasePool(2),
         )
         self.block_2 = nn.Sequential(
             BaseConv(64, 128, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(64, 128, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(128, 128, 3, 1, activation=nn.ReLU(), use_bn=True),
         ) #output 2_2
 
         self.block_3 = nn.Sequential(
             BasePool(2),
             BaseConv(128, 256, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(128, 256, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(128, 256, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(256, 256, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(256, 256, 3, 1, activation=nn.ReLU(), use_bn=True),
         ) #output 3_3
 
         self.block_4 = nn.Sequential(
             BasePool(2),
             BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(512, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(512, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
         ) #output 4_3
 
         self.block_5 = nn.Sequential(
             BasePool(2),
-            BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
-            BaseConv(256, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(512, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(512, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
+            BaseConv(512, 512, 3, 1, activation=nn.ReLU(), use_bn=True),
         ) #output 5_3
 
     def forward(self, input):
@@ -147,7 +148,7 @@ class ModelNetwork(nn.Module):
         old_name = [0, 1, 3, 4, 7, 8, 10, 11, 14, 15, 17, 18, 20, 21, 24, 25, 27, 28, 30, 31, 34, 35, 37, 38, 40, 41]
         new_name = [1.0, 1.1, 2.0, 2.1, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3, 5.1, 5.2, 5.3]
         new_dict = {}
-        print(state_dict.keys())
+
         for i in range(len(new_name)):
             new_dict['block' + str(new_name[i]) + '.conv.weight'] = state_dict['features.'+str(old_name[2*i])+'.weight']
             new_dict['block' + str(new_name[i]) + '.conv.bias'] = state_dict['features.' + str(old_name[2 * i]) + '.bias']
