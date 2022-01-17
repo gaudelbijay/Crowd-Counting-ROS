@@ -26,6 +26,7 @@ test_dataset = Dataset(args.data_path, args.dataset, False)
 test_loader = data.DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+#device = torch.device("cpu")
 
 model = ModelNetwork().to(device)
 
@@ -74,7 +75,6 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
     writer.add_scalar('loss/train_loss_att', loss_att_avg / len(train_loader), epoch)
 
 
-    # TODO: Need to fix different devices problem during evaluation (gpu and cpu) 
     model.eval()
     with torch.no_grad():
         mae, mse = 0.0, 0.0
@@ -83,10 +83,11 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
             gt = images.to(device)
 
             predict, _ = model(images)
+            #print('gt item: ', gt)
 
-            print('predict:{:.2f} label:{:.2f}'.format(predict.sum().item(), gt.item()))
-            mae += torch.abs(predict.sum() - gt).item()
-            mse += ((predict.sum() - gt) ** 2).item()
+            print('predict:{:.2f} label:{:.2f}'.format(predict.sum().item(), gt.sum().item()))
+            mae += torch.abs(predict.sum() - gt.sum()).item()
+            mse += ((predict.sum() - gt.sum()) ** 2).item()
 
         mae /= len(test_loader)
         mse /= len(test_loader)
@@ -102,6 +103,5 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
         if mae < best_mae:
             best_mae = mae
             torch.save(state, os.path.join(args.save_path, 'checkpoint_best.pth'))
-    
 
 writer.close()
