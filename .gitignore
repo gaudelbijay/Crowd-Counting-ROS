@@ -7,6 +7,11 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+src/crowd_counting_pkg/models/SAFNet/checkpoint/
+
+src/crowd_counting_pkg/models/SAFNet/data/
+src/crowd_counting_pkg/models/SAFNet/src/logs/
+
 .Python
 build/
 develop-eggs/

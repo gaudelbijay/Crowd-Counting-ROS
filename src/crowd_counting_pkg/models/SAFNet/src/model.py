@@ -137,6 +137,7 @@ class ModelNetwork(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.vgg = VGG()
+        self.load_vgg()
         self.amp = MapPath()
         self.dmp = MapPath()
 
@@ -150,12 +151,12 @@ class ModelNetwork(nn.Module):
         new_dict = {}
 
         for i in range(len(new_name)):
-            new_dict['block' + str(new_name[i]) + '.conv.weight'] = state_dict['features.'+str(old_name[2*i])+'.weight']
-            new_dict['block' + str(new_name[i]) + '.conv.bias'] = state_dict['features.' + str(old_name[2 * i]) + '.bias']
-            new_dict['block' + str(new_name[i]) + '.bn.weight'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.weight']
-            new_dict['block' + str(new_name[i]) + '.bn.bias'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.bias']
-            new_dict['block' + str(new_name[i]) + '.bn.running_mean'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_mean']
-            new_dict['block' + str(new_name[i]) + '.bn.running_var'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_var']
+            new_dict['block_' + str(new_name[i]) + '.conv.weight'] = state_dict['features.'+str(old_name[2*i])+'.weight']
+            new_dict['block_' + str(new_name[i]) + '.conv.bias'] = state_dict['features.' + str(old_name[2 * i]) + '.bias']
+            new_dict['block_' + str(new_name[i]) + '.bn.weight'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.weight']
+            new_dict['block_' + str(new_name[i]) + '.bn.bias'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.bias']
+            new_dict['block_' + str(new_name[i]) + '.bn.running_mean'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_mean']
+            new_dict['block_' + str(new_name[i]) + '.bn.running_var'] = state_dict['features.' + str(old_name[2 * i + 1]) + '.running_var']
 
         self.vgg.load_state_dict(new_dict)
 

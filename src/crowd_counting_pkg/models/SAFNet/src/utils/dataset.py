@@ -53,7 +53,7 @@ class Dataset(data.Dataset):
 
 if __name__ == '__main__':
     is_train = False
-    dataset = Dataset('../data', 'SHB', is_train)
+    dataset = Dataset('../../data', 'SHB', is_train)
     loader = data.DataLoader(dataset, batch_size=1, shuffle=True)
     if is_train:
         for image, label, att in loader:

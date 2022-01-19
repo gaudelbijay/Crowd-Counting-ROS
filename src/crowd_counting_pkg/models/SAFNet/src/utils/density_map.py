@@ -6,7 +6,7 @@ import glob
 from matplotlib import pyplot as plt
 from scipy.ndimage.filters import gaussian_filter
 
-root = '../data/ShanghaiTech'
+root = '../../data/ShanghaiTech'
 
 part_A_train = os.path.join(root, 'part_A/train_data', 'images')
 part_A_test = os.path.join(root, 'part_A/test_data', 'images')
@@ -39,3 +39,4 @@ for img_path in img_paths:
         hf['density'] = k
         hf['attention'] = att
         hf['gt'] = count
+        print('gt: ',count)

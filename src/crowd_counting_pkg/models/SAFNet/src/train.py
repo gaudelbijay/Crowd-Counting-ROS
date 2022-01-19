@@ -14,7 +14,7 @@ parser.add_argument('--epoch', default=500, type=int, help='train epochs')
 parser.add_argument('--dataset', default='SHA', type=str, help='dataset')
 parser.add_argument('--data_path', default='../data/', type=str, help='path to dataset')
 parser.add_argument('--lr', default=1e-4, type=float, help='initial learning rate')
-parser.add_argument('--load', default=False, action='store_true', help='load checkpoint')
+parser.add_argument('--load', default=True, action='store_true', help='load checkpoint')
 parser.add_argument('--save_path', default='../checkpoint/SFANet', type=str, help='path to save checkpoint')
 parser.add_argument('--log_path', default='./logs', type=str, help='path to log')
 
@@ -80,14 +80,14 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
         mae, mse = 0.0, 0.0
         for i, (images, gt) in enumerate(test_loader):
             images = images.to(device)
-            gt = images.to(device)
+            gt = gt.to(device)
 
             predict, _ = model(images)
             #print('gt item: ', gt)
 
-            print('predict:{:.2f} label:{:.2f}'.format(predict.sum().item(), gt.sum().item()))
-            mae += torch.abs(predict.sum() - gt.sum()).item()
-            mse += ((predict.sum() - gt.sum()) ** 2).item()
+            print('predict:{:.2f} label:{:.2f}'.format(predict.sum().item(), gt.item()))
+            mae += torch.abs(predict.sum() - gt).item()
+            mse += ((predict.sum() - gt) ** 2).item()
 
         mae /= len(test_loader)
         mse /= len(test_loader)
