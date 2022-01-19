@@ -25,6 +25,8 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.catkin_tools/
+.gitignore
 
 
 #logs saved model and dataset
