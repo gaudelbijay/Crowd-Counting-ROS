@@ -7,11 +7,6 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-src/crowd_counting_pkg/models/SAFNet/checkpoint/
-
-src/crowd_counting_pkg/models/SAFNet/data/
-src/crowd_counting_pkg/models/SAFNet/src/logs/
-
 .Python
 build/
 develop-eggs/
@@ -30,6 +25,14 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+
+#logs saved model and dataset
+
+src/crowd_counting_pkg/models/SAFNet/checkpoint/
+src/crowd_counting_pkg/models/SAFNet/data/
+src/crowd_counting_pkg/models/SAFNet/src/logs/
+
 MANIFEST
 
 # PyInstaller
