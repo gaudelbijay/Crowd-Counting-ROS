@@ -1,4 +1,4 @@
-import imp
+#!/usr/bin/env python
 import os 
 import cv2 
 import rospy 
@@ -7,10 +7,12 @@ import torch
 from std_msgs.msg import String 
 from sensor_msgs.msg import Image 
 from cv_bridge import CvBridge, CvBridgeError
-from models.SAFNet.src.utils.transforms import Transforms
+from transforms import Transforms
 
 bridge = CvBridge() 
-model = torch.jit.load('../models/SAFNet/checkpoint/SFANet/model_scripted.pt')
+print('model: ')
+model = torch.load('../models/SAFNet/checkpoint/SFANet/latest.pth') # TODO: convert model into jit model then save and load
+print(model)
 model.eval() 
 
 def image_cb(data):
@@ -22,7 +24,7 @@ def image_cb(data):
 
 def main():
     rospy.init_node('counter', anonymous=True)
-    image_subscriber = rospy.Subscriber('/webcam/image_raw', Image, image_cb, queue_size=10, buff_size=10000)
+    image_subscriber = rospy.Subscriber('/webcam/image_raw', Image, image_cb, queue_size=10, buff_size=10000) #/camera/rgb/image_raw for real world
     try: 
         rospy.spin()
     except KeyboardInterrupt as e:

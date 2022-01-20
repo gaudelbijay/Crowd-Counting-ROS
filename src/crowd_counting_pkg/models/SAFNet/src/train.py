@@ -100,8 +100,12 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
                  'mse': mse}
         torch.save(state, os.path.join(args.save_path, 'checkpoint_latest.pth'))
 
+        torch.save(model, os.path.join(args.save_path, 'latest.pth'))
+
         if mae < best_mae:
             best_mae = mae
             torch.save(state, os.path.join(args.save_path, 'checkpoint_best.pth'))
+            
+            torch.save(model, os.path.join(args.save_path, 'best.pth'))
 
 writer.close()

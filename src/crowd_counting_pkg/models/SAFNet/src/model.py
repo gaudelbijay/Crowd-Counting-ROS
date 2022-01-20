@@ -19,7 +19,7 @@ class BaseConv(nn.Module):
         input = self.conv(input)
         if self.use_bn:
             input = self.bn(input)
-        if self.activation:
+        if self.activation is not None:
             input = self.activation(input)
 
         return input
