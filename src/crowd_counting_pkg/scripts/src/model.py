@@ -110,8 +110,8 @@ class MapPath(nn.Module):
         self.conv6 = BaseConv(64, 64, 3, 1, activation=nn.ReLU(), use_bn=True)
         self.conv7 = BaseConv(64, 32, 3, 1, activation=nn.ReLU(), use_bn=True)
 
-    def forward(self, *input):
-        conv2_2, conv3_3, conv4_3, conv5_3 = input
+    def forward(self, conv2_2, conv3_3, conv4_3, conv5_3):
+        # conv2_2, conv3_3, conv4_3, conv5_3 = input
 
         input = self.upsample(conv5_3)
 
@@ -161,9 +161,9 @@ class ModelNetwork(nn.Module):
         self.vgg.load_state_dict(new_dict)
 
     def forward(self, input):
-        input = self.vgg(input)
-        amp_out = self.amp(*input)
-        dmp_out = self.dmp(*input)
+        conv2_2, conv3_3, conv4_3, conv5_3 = self.vgg(input)
+        amp_out = self.amp(conv2_2, conv3_3, conv4_3, conv5_3)
+        dmp_out = self.dmp(conv2_2, conv3_3, conv4_3, conv5_3)
 
         amp_out = self.conv_att(amp_out)
         dmp_out = amp_out * dmp_out

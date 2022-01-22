@@ -1,3 +1,4 @@
+from operator import mod
 import torch
 from torch import nn
 from torch import optim
@@ -101,11 +102,14 @@ for epoch in range(start_epoch, start_epoch + args.epoch):
         torch.save(state, os.path.join(args.save_path, 'checkpoint_latest.pth'))
 
         torch.save(model, os.path.join(args.save_path, 'latest.pth'))
+        script_model = torch.jit.script(model)
+        script_model.save(os.path.join(args.save_path, 'scripted_latest.pth'))
 
         if mae < best_mae:
             best_mae = mae
             torch.save(state, os.path.join(args.save_path, 'checkpoint_best.pth'))
             
-            torch.save(model, os.path.join(args.save_path, 'best.pth'))
+            script_model = torch.jit.script(model)
+            script_model.save(os.path.join(args.save_path, 'scripted_best.pth'))
 
 writer.close()

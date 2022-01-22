@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import h5py
 import os
-from utils.transforms import Transforms
+from transforms import Transforms
 import glob
 from torchvision.transforms import functional
 
@@ -52,7 +52,7 @@ class Dataset(data.Dataset):
 
 
 if __name__ == '__main__':
-    is_train = False
+    is_train = True
     dataset = Dataset('../../data', 'SHB', is_train)
     loader = data.DataLoader(dataset, batch_size=1, shuffle=True)
     if is_train:
