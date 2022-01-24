@@ -1,8 +1,0 @@
-prefix=/home/gaudel/Desktop/crowd_counting/install
-
-Name: crowd_counting_pkg
-Description: Description of crowd_counting_pkg
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
