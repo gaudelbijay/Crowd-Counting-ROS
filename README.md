@@ -1,4 +1,3 @@
-    ├── build                   
     ├── devel                    
     ├── src 
     |    ├── crowd_counting_pkg
@@ -20,4 +19,5 @@
     |    |  ├── CMakeLists.txt
     |    |  ├── package.xml 
     |    ├── CMakeLists.txt
+    ├── .catkin_workspace
     └── README.md
