@@ -1,2 +1,0 @@
-
--DCATKIN_DEVEL_PREFIX=/home/gaudel/Desktop/Crowd-Counting-ROS/devel -DCMAKE_INSTALL_PREFIX=/home/gaudel/Desktop/Crowd-Counting-ROS/install -G Unix Makefiles
